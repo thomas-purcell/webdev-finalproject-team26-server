@@ -7,5 +7,5 @@ const server = express();
 server.use(cors());
 
 server.listen(config.port, () => {
-  logger.info(`Server listening on port ${config.port}`);
+  logger.info(`Server is listening on port ${config.port}`);
 });
