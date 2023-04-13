@@ -15,6 +15,7 @@ server.use(cors({
   credentials: true,
 }));
 server.use(cookieParser());
+server.set('trust proxy', 1);
 
 accountController(server);
 
