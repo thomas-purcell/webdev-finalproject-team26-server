@@ -1,5 +1,4 @@
 import * as accountModel from './accountModel.js';
-import logger from '../../logger.js';
 
 const cookieOptions = {
   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // one week
@@ -40,7 +39,7 @@ const loginHandler = async (req, res) => {
 
 const logoutHandler = (req, res) => {
   accountModel.logUserOut(req.cookies.user_session);
-  res.clearCookie('user_session');
+  res.clearCookie('user_session', cookieOptions);
   res.sendStatus(200);
 };
 
