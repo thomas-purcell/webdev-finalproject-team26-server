@@ -44,7 +44,7 @@ export const registerNewUser = async (newAccountInfo) => {
 export const logUserOut = (cookie) => {
   const idx = loggedInUsers.findIndex((account) => account.cookie === cookie);
   if (idx !== -1) {
-    logger.info('Logging out:', loggedInUsers.at(idx).account.email);
+    logger.info('Logging out:', loggedInUsers[idx].account.email);
     loggedInUsers.splice(idx, 1);
   }
 };
