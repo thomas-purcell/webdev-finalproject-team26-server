@@ -1,12 +1,20 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
 import config from './config.js';
 import logger from './logger.js';
 import accountController from './services/accounts/accountController.js';
 
+mongoose.connect(config.dbConnectionString);
+
 const server = express();
 server.use(express.json());
-server.use(cors());
+server.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
+server.use(cookieParser());
 
 accountController(server);
 
