@@ -11,7 +11,7 @@ mongoose.connect(config.dbConnectionString);
 const server = express();
 server.use(express.json());
 server.use(cors({
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://deploy-preview-2--ornate-swan-b1069a.netlify.app'],
   credentials: true,
 }));
 server.use(cookieParser());
