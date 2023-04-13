@@ -5,18 +5,16 @@ const cookieOptions = {
   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // one week
   secure: true,
   httpOnly: true,
-  sameSite: 'none',
+  sameSite: 'None',
 };
 
 const registrationHandler = async (req, res) => {
-  logger.info(req.body);
   const cookie = await accountModel.registerNewUser(req.body);
   res.cookie('user_session', cookie, cookieOptions);
   res.sendStatus(200);
 };
 
 const loginHandler = async (req, res) => {
-  logger.info(req.body);
   // Check if the user is already logged in with a cookie
   const user = accountModel.getLoggedInUser(req.cookies.user_session);
   if (user) {
