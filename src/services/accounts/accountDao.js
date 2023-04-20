@@ -3,11 +3,13 @@ import accountSchema from './accountSchema.js';
 
 export const accountModel = mongoose.model('AccountModel', accountSchema);
 
+// TODO: don't want to send passwords back from mongo
 export const getAccountByEmail = async (email) => {
   const account = await accountModel.findOne({ email });
   return account;
 };
 
+// TODO: don't want to send passwords back from mongo
 export const getAccountByUsername = async (username) => {
   const account = await accountModel.findOne({ username });
   return account;

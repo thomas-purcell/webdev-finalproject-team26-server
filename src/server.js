@@ -14,6 +14,7 @@ server.use(cors({
   origin: [
     'http://localhost:3000',
     'https://deploy-preview-5--ornate-swan-b1069a.netlify.app',
+    'https://deploy-preview-6--ornate-swan-b1069a.netlify.app',
     'https://master--ornate-swan-b1069a.netlify.app/',
   ],
   credentials: true,
