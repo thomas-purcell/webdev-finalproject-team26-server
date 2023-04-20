@@ -17,7 +17,7 @@ const loginHandler = async (req, res) => {
   // Check if the user is already logged in with a cookie
   const user = accountModel.getLoggedInUser(req.cookies.user_session);
   if (user) {
-    res.sendStatus(200);
+    res.send({ profile: user.account });
     return;
   }
   // If the user wasn't logged in, try to log them in with credentials
@@ -32,9 +32,11 @@ const loginHandler = async (req, res) => {
     res.sendStatus(403);
     return;
   }
+  const { account } = accountModel.getLoggedInUser(cookie);
+
   // If the log in was successful, then send the user their cookie and a 200
   res.cookie('user_session', cookie, cookieOptions);
-  res.sendStatus(200);
+  res.send({ profile: account });
 };
 
 const logoutHandler = (req, res) => {
