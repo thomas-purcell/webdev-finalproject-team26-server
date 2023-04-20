@@ -25,9 +25,12 @@
     "eslint-plugin-import": "^2.27.5"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "mongoose": "^6.10.0",
     "nodemon": "^2.0.22"
   }
 }
