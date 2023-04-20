@@ -12,7 +12,7 @@ export const logUserIn = async ({ email, username, password }) => {
     // try to login using email if one was provided
     account = await accountDao.getAccountByEmail(email);
   }
-  if (username) {
+  if (!account && username) {
     // try to login using username if one was provided
     account = await accountDao.getAccountByUsername(username);
   }
