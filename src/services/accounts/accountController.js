@@ -9,8 +9,9 @@ const cookieOptions = {
 
 const registrationHandler = async (req, res) => {
   const cookie = await accountModel.registerNewUser(req.body);
+  const user = accountModel.getLoggedInUser(cookie);
   res.cookie('user_session', cookie, cookieOptions);
-  res.sendStatus(200);
+  res.send({ profile: user.account });
 };
 
 const loginHandler = async (req, res) => {
