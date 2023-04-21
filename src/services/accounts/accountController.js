@@ -46,10 +46,16 @@ const logoutHandler = (req, res) => {
   res.sendStatus(200);
 };
 
+const profileHandler = async (req, res) => {
+  const account = await accountModel.getUserByUsername(req.params.username);
+  res.send(account);
+};
+
 const accountController = (server) => {
   server.post('/register', registrationHandler);
   server.post('/login', loginHandler);
   server.post('/logout', logoutHandler);
+  server.get('/profile/:username', profileHandler);
 };
 
 export default accountController;
