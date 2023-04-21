@@ -33,7 +33,8 @@ const mediaByUserHandler = async (req, res) => {
         ...watchedMedia, watched: true, liked: false, reviewed: false,
       });
     } else {
-      media.at(media.findIndex((m) => m.mediaId === watchedMedia.mediaId)).watched = true;
+      const watchedIdx = media.findIndex((m) => m.mediaId === watchedMedia.mediaId);
+      media[watchedIdx].watched = true;
     }
   });
   reviews.forEach((reviewedMedia) => {
@@ -42,7 +43,8 @@ const mediaByUserHandler = async (req, res) => {
         ...reviewedMedia, watched: false, liked: false, reviewed: true,
       });
     } else {
-      const reviewed = media.at(media.findIndex((m) => m.mediaId === reviewedMedia.mediaId));
+      const reviewedIdx = media.findIndex((m) => m.mediaId === reviewedMedia.mediaId);
+      const reviewed = media[reviewedIdx];
       reviewed.reviewed = true;
       reviewed.rating = reviewedMedia.rating;
       reviewed.comment = reviewedMedia.comment;
