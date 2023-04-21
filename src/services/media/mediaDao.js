@@ -53,6 +53,15 @@ export const deleteLikeByUserIdMediaId = async (mediaType, mediaId, userId) => {
   return result;
 };
 
+export const addReviewByUserIdMediaId = async (mediaType, mediaId, userId, review) => {
+  const result = await reviewsModel.findOneAndUpdate(
+    { mediaType, mediaId, userId },
+    review,
+    { upsert: true },
+  );
+  return result;
+};
+
 export const addMedia = async (media) => {
   const result = await mediaModel.create(media);
   return result;

@@ -1,4 +1,6 @@
 import * as mediaDao from './mediaDao.js';
+import * as accountModel from '../accounts/accountModel.js';
+import logger from '../../logger.js';
 
 export const getLikesByUser = async (userId) => {
   const likes = await mediaDao.getLikesByUserId(userId);
@@ -46,7 +48,34 @@ export const deleteLikeByUserIdMediaId = async (mediaType, mediaId, userId) => {
   return result;
 };
 
+export const addReviewByUserIdMediaId = async (mediaType, mediaId, userId, review) => {
+  const newReview = {
+    mediaId,
+    mediaType,
+    rating: 0,
+    comment: '',
+    userId,
+    ...review,
+    timestamp: (new Date()).getTime().toString(),
+  };
+  logger.info(newReview);
+  const result = await mediaDao.addReviewByUserIdMediaId(mediaType, mediaId, userId, newReview);
+  return result;
+};
+
 export const addMedia = async (media) => {
   const result = await mediaDao.addMedia(media);
   return result;
+};
+
+export const getReviewsByMediaId = async (mediaType, mediaId) => {
+  const result = await mediaDao.getReviewsByMediaId(mediaType, mediaId);
+  const enrichedResults = await Promise.all(result.map(async (media) => {
+    const { username } = await accountModel.getAccountById(media.userId);
+    return {
+      ...media,
+      username,
+    };
+  }));
+  return enrichedResults;
 };

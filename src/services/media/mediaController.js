@@ -1,6 +1,7 @@
 import * as mediaModel from './mediaModel.js';
 import * as accountModel from '../accounts/accountModel.js';
-// import logger from '../../logger.js';
+// eslint-disable-next-line no-unused-vars
+import logger from '../../logger.js';
 
 const likesByUserHandler = async (req, res) => {
   const { username } = req.params;
@@ -149,6 +150,23 @@ const addMediaHandler = async (req, res) => {
   res.send(addedMedia);
 };
 
+const addReviewByUsernameMediaIdHandler = async (req, res) => {
+  const { username, mediaType, mediaId } = req.params;
+  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+    res.sendStatus(403);
+    return;
+  }
+  const { _id: userId } = await accountModel.getUserByUsername(username);
+  await mediaModel.addReviewByUserIdMediaId(mediaType, mediaId, userId, req.body);
+  res.sendStatus(200);
+};
+
+const getReviewsByMediaIdHandler = async (req, res) => {
+  const { mediaType, mediaId } = req.params;
+  const result = await mediaModel.getReviewsByMediaId(mediaType, mediaId);
+  res.send(result);
+};
+
 const mediaController = (server) => {
   server.get('/profile/:username/likes', likesByUserHandler);
   server.get('/profile/:username/watches', watchesByUserHandler);
@@ -158,8 +176,10 @@ const mediaController = (server) => {
   server.delete('/profile/:username/watches/:mediaType/:mediaId', deleteWatchByUsernameMediaIdHandler);
   server.post('/profile/:username/likes/:mediaType/:mediaId', addLikeByUsernameMediaIdHandler);
   server.delete('/profile/:username/likes/:mediaType/:mediaId', deleteLikeByUsernameMediaIdHandler);
+  server.post('/profile/:username/reviews/:mediaType/:mediaId', addReviewByUsernameMediaIdHandler);
   server.post('/media', addMediaHandler);
   server.get('/media/:mediaType/:mediaId', mediaByMediaIdHandler);
+  server.get('/media/:mediaType/:mediaId/reviews', getReviewsByMediaIdHandler);
 };
 
 export default mediaController;
