@@ -18,6 +18,7 @@ export const reviewsSchema = mongoose.Schema({
   userId: String,
   comment: String,
   rating: Number,
+  timestamp: String,
 }, { collection: 'reviews' });
 
 export const mediaSchema = mongoose.Schema({
