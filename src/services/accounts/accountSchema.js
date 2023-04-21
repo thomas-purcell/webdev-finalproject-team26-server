@@ -9,10 +9,20 @@ const schema = mongoose.Schema({
   lastName: String,
   orgName: String,
   bio: String,
-  contacts: Array,
+  contacts: [
+    {
+      type: String,
+      value: String,
+    },
+  ],
   watchMovies: Boolean,
   watchAnime: Boolean,
   watchTv: Boolean,
+  virtualMeetings: {
+    link: String,
+    meetingWeekday: String,
+    meetingTime: String,
+  },
 }, { collection: 'users' });
 
 export default schema;

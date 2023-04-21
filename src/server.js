@@ -6,6 +6,7 @@ import config from './config.js';
 import logger from './logger.js';
 import accountController from './services/accounts/accountController.js';
 import mediaController from './services/media/mediaController.js';
+import clubController from './services/clubs/clubController.js';
 
 mongoose.connect(config.dbConnectionString);
 
@@ -23,6 +24,7 @@ server.set('trust proxy', 1);
 
 accountController(server);
 mediaController(server);
+clubController(server);
 
 server.listen(config.port, () => {
   logger.info(`Server is listening on port ${config.port}`);
