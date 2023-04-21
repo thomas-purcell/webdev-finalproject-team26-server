@@ -10,11 +10,11 @@ export const logUserIn = async ({ email, username, password }) => {
   let account;
   if (email) {
     // try to login using email if one was provided
-    account = await accountDao.getAccountByEmail(email);
+    account = await accountDao.getAccountByEmail(email, true);
   }
   if (!account && username) {
     // try to login using username if one was provided
-    account = await accountDao.getAccountByUsername(username);
+    account = await accountDao.getAccountByUsername(username, true);
   }
   // if we didn't find an account then we can't compare passwords
   // if we did get an account, see if they have the right password
@@ -51,5 +51,11 @@ export const logUserOut = (cookie) => {
 
 export const getLoggedInUser = (cookie) => {
   const account = loggedInUsers.find((user) => user.cookie === cookie);
+  return account;
+};
+
+export const getUserByUsername = async (username) => {
+  const account = await accountDao.getAccountByUsername(username, false);
+  logger.info(account);
   return account;
 };

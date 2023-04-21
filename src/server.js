@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import config from './config.js';
 import logger from './logger.js';
 import accountController from './services/accounts/accountController.js';
+import mediaController from './services/media/mediaController.js';
 
 mongoose.connect(config.dbConnectionString);
 
@@ -23,6 +24,7 @@ server.use(cookieParser());
 server.set('trust proxy', 1);
 
 accountController(server);
+mediaController(server);
 
 server.listen(config.port, () => {
   logger.info(`Server is listening on port ${config.port}`);
