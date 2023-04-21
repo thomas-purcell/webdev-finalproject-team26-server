@@ -78,6 +78,10 @@ const mediaByUsernameMediaIdHandler = async (req, res) => {
     mediaModel.getWatchesByUser(userId),
     mediaModel.getReviewsByUser(userId),
   ]);
+  if (!media) {
+    res.sendStatus(403);
+    return;
+  }
   const review = reviews.find((l) => l.mediaId === mediaId);
   const result = {
     ...media,
@@ -136,8 +140,13 @@ const deleteLikeByUsernameMediaIdHandler = async (req, res) => {
 
 const addMediaHandler = async (req, res) => {
   const media = req.body;
-  await mediaModel.addMedia(media);
-  res.sendStatus(200);
+  const existingMedia = await mediaModel.getMediaByMediaId(media.mediaType, media.mediaId);
+  if (existingMedia) {
+    res.send(existingMedia);
+    return;
+  }
+  const addedMedia = await mediaModel.addMedia(media);
+  res.send(addedMedia);
 };
 
 const mediaController = (server) => {
