@@ -59,6 +59,10 @@ const mediaByMediaIdHandler = async (req, res) => {
     mediaModel.getMediaByMediaId(mediaType, mediaId),
     mediaModel.getAverageRatingByMediaId(mediaType, mediaId),
   ]);
+  if (!media) {
+    res.sendStatus(404);
+    return;
+  }
   res.send({
     ...media,
     avgRating: rating,
