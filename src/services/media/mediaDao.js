@@ -52,3 +52,8 @@ export const deleteLikeByUserIdMediaId = async (mediaType, mediaId, userId) => {
   const result = await likesModel.deleteOne({ mediaType, mediaId, userId });
   return result;
 };
+
+export const addMedia = async (media) => {
+  const result = await mediaModel.create(media);
+  return result;
+};

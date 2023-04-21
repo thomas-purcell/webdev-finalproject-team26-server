@@ -31,12 +31,20 @@ export const logUserIn = async ({ email, username, password }) => {
 };
 
 export const registerNewUser = async (newAccountInfo) => {
-  await accountDao.registerUser(newAccountInfo);
-  logger.info('Registering:', newAccountInfo.email);
+  const newAccount = {
+    ...newAccountInfo,
+    watchAnime: false,
+    watchMovies: false,
+    watchTv: false,
+    bio: '',
+    contacts: [],
+  };
+  await accountDao.registerUser(newAccount);
+  logger.info('Registering:', newAccount.email);
   // log the user in after creating their account
   const cookie = await logUserIn({
-    email: newAccountInfo.email,
-    password: newAccountInfo.password,
+    email: newAccount.email,
+    password: newAccount.password,
   });
   return cookie;
 };

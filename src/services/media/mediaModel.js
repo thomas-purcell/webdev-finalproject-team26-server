@@ -45,3 +45,8 @@ export const deleteLikeByUserIdMediaId = async (mediaType, mediaId, userId) => {
   const result = await mediaDao.deleteLikeByUserIdMediaId(mediaType, mediaId, userId);
   return result;
 };
+
+export const addMedia = async (media) => {
+  const result = await mediaDao.addMedia(media);
+  return result;
+};

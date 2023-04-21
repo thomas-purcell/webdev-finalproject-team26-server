@@ -130,6 +130,12 @@ const deleteLikeByUsernameMediaIdHandler = async (req, res) => {
   res.sendStatus(200);
 };
 
+const addMediaHandler = async (req, res) => {
+  const media = req.body;
+  await mediaModel.addMedia(media);
+  res.sendStatus(200);
+};
+
 const mediaController = (server) => {
   server.get('/profile/:username/likes', likesByUserHandler);
   server.get('/profile/:username/watches', watchesByUserHandler);
@@ -139,6 +145,7 @@ const mediaController = (server) => {
   server.delete('/profile/:username/watches/:mediaType/:mediaId', deleteWatchByUsernameMediaIdHandler);
   server.post('/profile/:username/likes/:mediaType/:mediaId', addLikeByUsernameMediaIdHandler);
   server.delete('/profile/:username/likes/:mediaType/:mediaId', deleteLikeByUsernameMediaIdHandler);
+  server.post('/media', addMediaHandler);
   server.get('/media/:mediaType/:mediaId', mediaByMediaIdHandler);
 };
 
