@@ -59,3 +59,8 @@ export const getUserByUsername = async (username) => {
   logger.info(account);
   return account;
 };
+
+export const checkCookie = (cookie, username) => {
+  const user = getLoggedInUser(cookie);
+  return user?.account.username === username;
+};

@@ -1,5 +1,6 @@
 import * as mediaModel from './mediaModel.js';
 import * as accountModel from '../accounts/accountModel.js';
+// import logger from '../../logger.js';
 
 const likesByUserHandler = async (req, res) => {
   const { username } = req.params;
@@ -52,14 +53,90 @@ const mediaByUserHandler = async (req, res) => {
 
 const mediaByMediaIdHandler = async (req, res) => {
   const { mediaType, mediaId } = req.params;
-  const media = await mediaModel.getMediaByMediaId(mediaType, mediaId);
-  res.send(media);
+  const [media, rating] = await Promise.all([
+    mediaModel.getMediaByMediaId(mediaType, mediaId),
+    mediaModel.getAverageRatingByMediaId(mediaType, mediaId),
+  ]);
+  res.send({
+    ...media,
+    avgRating: rating,
+  });
+};
+
+const mediaByUsernameMediaIdHandler = async (req, res) => {
+  const { mediaType, mediaId, username } = req.params;
+  const { _id: userId } = await accountModel.getUserByUsername(username);
+  const [media, likes, watches, reviews] = await Promise.all([
+    mediaModel.getMediaByMediaId(mediaType, mediaId),
+    mediaModel.getLikesByUser(userId),
+    mediaModel.getWatchesByUser(userId),
+    mediaModel.getReviewsByUser(userId),
+  ]);
+  const review = reviews.find((l) => l.mediaId === mediaId);
+  const result = {
+    ...media,
+    liked: !!likes.find((l) => l.mediaId === mediaId),
+    watched: !!watches.find((l) => l.mediaId === mediaId),
+    reviewed: !!review,
+    rating: review?.rating,
+    comment: review?.comment,
+  };
+  res.send(result);
+};
+
+const addWatchByUsernameMediaIdHandler = async (req, res) => {
+  const { username, mediaType, mediaId } = req.params;
+  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+    res.sendStatus(403);
+    return;
+  }
+  const { _id: userId } = await accountModel.getUserByUsername(username);
+  await mediaModel.addWatchByUserIdMediaId(mediaType, mediaId, userId);
+  res.sendStatus(200);
+};
+
+const deleteWatchByUsernameMediaIdHandler = async (req, res) => {
+  const { username, mediaType, mediaId } = req.params;
+  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+    res.sendStatus(403);
+    return;
+  }
+  const { _id: userId } = await accountModel.getUserByUsername(username);
+  await mediaModel.deleteWatchByUserIdMediaId(mediaType, mediaId, userId);
+  res.sendStatus(200);
+};
+
+const addLikeByUsernameMediaIdHandler = async (req, res) => {
+  const { username, mediaType, mediaId } = req.params;
+  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+    res.sendStatus(403);
+    return;
+  }
+  const { _id: userId } = await accountModel.getUserByUsername(username);
+  await mediaModel.addLikeByUserIdMediaId(mediaType, mediaId, userId);
+  res.sendStatus(200);
+};
+
+const deleteLikeByUsernameMediaIdHandler = async (req, res) => {
+  const { username, mediaType, mediaId } = req.params;
+  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+    res.sendStatus(403);
+    return;
+  }
+  const { _id: userId } = await accountModel.getUserByUsername(username);
+  await mediaModel.deleteLikeByUserIdMediaId(mediaType, mediaId, userId);
+  res.sendStatus(200);
 };
 
 const mediaController = (server) => {
   server.get('/profile/:username/likes', likesByUserHandler);
   server.get('/profile/:username/watches', watchesByUserHandler);
   server.get('/profile/:username/media', mediaByUserHandler);
+  server.get('/profile/:username/media/:mediaType/:mediaId', mediaByUsernameMediaIdHandler);
+  server.post('/profile/:username/watches/:mediaType/:mediaId', addWatchByUsernameMediaIdHandler);
+  server.delete('/profile/:username/watches/:mediaType/:mediaId', deleteWatchByUsernameMediaIdHandler);
+  server.post('/profile/:username/likes/:mediaType/:mediaId', addLikeByUsernameMediaIdHandler);
+  server.delete('/profile/:username/likes/:mediaType/:mediaId', deleteLikeByUsernameMediaIdHandler);
   server.get('/media/:mediaType/:mediaId', mediaByMediaIdHandler);
 };
 

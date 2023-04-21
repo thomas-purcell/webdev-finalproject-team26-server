@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import {
   likesSchema, mediaSchema, reviewsSchema, watchesSchema,
 } from './mediaSchema.js';
-import logger from '../../logger.js';
 
 export const likesModel = mongoose.model('LikesModel', likesSchema);
 export const watchesModel = mongoose.model('WatchesModel', watchesSchema);
@@ -26,6 +25,30 @@ export const getReviewsByUserId = async (userId) => {
 
 export const getMediaByMediaId = async (mediaType, mediaId) => {
   const media = await mediaModel.findOne({ mediaType, mediaId }).lean();
-  logger.info(media);
   return media;
+};
+
+export const getReviewsByMediaId = async (mediaType, mediaId) => {
+  const reviews = await reviewsModel.find({ mediaType, mediaId }).lean();
+  return reviews;
+};
+
+export const addWatchByUserIdMediaId = async (mediaType, mediaId, userId) => {
+  const result = await watchesModel.create({ mediaType, mediaId, userId });
+  return result;
+};
+
+export const deleteWatchByUserIdMediaId = async (mediaType, mediaId, userId) => {
+  const result = await watchesModel.deleteOne({ mediaType, mediaId, userId });
+  return result;
+};
+
+export const addLikeByUserIdMediaId = async (mediaType, mediaId, userId) => {
+  const result = await likesModel.create({ mediaType, mediaId, userId });
+  return result;
+};
+
+export const deleteLikeByUserIdMediaId = async (mediaType, mediaId, userId) => {
+  const result = await likesModel.deleteOne({ mediaType, mediaId, userId });
+  return result;
 };

@@ -19,3 +19,29 @@ export const getMediaByMediaId = async (mediaType, mediaId) => {
   const media = await mediaDao.getMediaByMediaId(mediaType, mediaId);
   return media;
 };
+
+export const getAverageRatingByMediaId = async (mediaType, mediaId) => {
+  const reviews = await mediaDao.getReviewsByMediaId(mediaType, mediaId);
+  const ratingTotal = reviews.reduce((sum, r) => sum + r.rating, 0);
+  return ratingTotal / reviews.length;
+};
+
+export const addWatchByUserIdMediaId = async (mediaType, mediaId, userId) => {
+  const result = await mediaDao.addWatchByUserIdMediaId(mediaType, mediaId, userId);
+  return result;
+};
+
+export const deleteWatchByUserIdMediaId = async (mediaType, mediaId, userId) => {
+  const result = await mediaDao.deleteWatchByUserIdMediaId(mediaType, mediaId, userId);
+  return result;
+};
+
+export const addLikeByUserIdMediaId = async (mediaType, mediaId, userId) => {
+  const result = await mediaDao.addLikeByUserIdMediaId(mediaType, mediaId, userId);
+  return result;
+};
+
+export const deleteLikeByUserIdMediaId = async (mediaType, mediaId, userId) => {
+  const result = await mediaDao.deleteLikeByUserIdMediaId(mediaType, mediaId, userId);
+  return result;
+};
