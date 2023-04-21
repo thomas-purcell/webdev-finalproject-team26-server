@@ -72,3 +72,9 @@ export const checkCookie = (cookie, username) => {
   const user = getLoggedInUser(cookie);
   return user?.account.username === username;
 };
+
+export const updateUser = async (updateAccountInfo) => {
+  await accountDao.updateUser(updateAccountInfo);
+  const account = await accountDao.getAccountByUsername(updateAccountInfo.username, false);
+  return account;
+};

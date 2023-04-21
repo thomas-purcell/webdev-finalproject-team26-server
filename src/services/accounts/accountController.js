@@ -1,3 +1,4 @@
+import logger from '../../logger.js';
 import * as accountModel from './accountModel.js';
 
 const cookieOptions = {
@@ -51,10 +52,25 @@ const profileHandler = async (req, res) => {
   res.send(account);
 };
 
+const updateProfileHandler = async (req, res) => {
+  const { username } = req.params;
+  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+    res.sendStatus(403);
+  }
+  const updateAccountInfo = req.body;
+  if (updateAccountInfo.password.length === 0) {
+    delete updateAccountInfo.password;
+  }
+  const updatedAccount = await accountModel.updateUser(updateAccountInfo);
+  logger.info(updatedAccount);
+  res.send(updatedAccount);
+};
+
 const accountController = (server) => {
   server.post('/register', registrationHandler);
   server.post('/login', loginHandler);
   server.post('/logout', logoutHandler);
+  server.put('/profile/:username', updateProfileHandler);
   server.get('/profile/:username', profileHandler);
 };
 
