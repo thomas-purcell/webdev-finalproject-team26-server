@@ -74,11 +74,12 @@ export const checkCookie = (cookie, username) => {
   return user?.account.username === username;
 };
 
-<<<<<<< Updated upstream
 export const updateUser = async (updateAccountInfo) => {
   await accountDao.updateUser(updateAccountInfo);
   const account = await accountDao.getAccountByUsername(updateAccountInfo.username, false);
-=======
+  return account;
+};
+
 export const getClubs = async () => {
   const clubs = await accountDao.getClubAccounts();
   return clubs;
@@ -86,6 +87,5 @@ export const getClubs = async () => {
 
 export const getAccountById = async (accountId) => {
   const account = await accountDao.getAccountById(accountId);
->>>>>>> Stashed changes
   return account;
 };

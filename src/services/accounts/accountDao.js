@@ -23,11 +23,12 @@ export const registerUser = async (newAccountInfo) => {
   await accountModel.create(newAccountInfo);
 };
 
-<<<<<<< Updated upstream
 export const updateUser = async (updateAccountInfo) => {
   const result = await accountModel.updateOne(updateAccountInfo).lean();
   logger.info(result);
-=======
+  return result;
+};
+
 export const getClubAccounts = async () => {
   const clubs = await accountModel.find({ isMemberAccount: false }).lean();
   return clubs;
@@ -35,6 +36,5 @@ export const getClubAccounts = async () => {
 
 export const getAccountById = async (accountId) => {
   const result = await accountModel.findOne({ _id: accountId }).lean();
->>>>>>> Stashed changes
   return result;
 };
