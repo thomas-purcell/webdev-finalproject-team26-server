@@ -41,9 +41,14 @@ export const deleteClubDiscussion = async (discussionId) => {
 };
 
 export const updateDiscussion = async (updateDiscussionInfo) => {
+  // eslint-disable-next-line no-underscore-dangle
   const discussionId = updateDiscussionInfo._id;
+  // eslint-disable-next-line no-underscore-dangle, no-param-reassign
   delete updateDiscussionInfo._id;
-  const result = await clubDiscussionsModel.updateOne({_id : discussionId},updateDiscussionInfo).lean();
+  const result = await clubDiscussionsModel.updateOne(
+    { _id: discussionId },
+    updateDiscussionInfo,
+  ).lean();
   logger.info(result);
   return result;
 };

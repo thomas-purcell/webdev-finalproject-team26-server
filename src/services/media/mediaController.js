@@ -60,8 +60,9 @@ const mediaByUserHandler = async (req, res) => {
     } else {
       const discussingIdx = media.findIndex((m) => m.mediaId === discussingMedia.mediaId);
       media[discussingIdx].discussing = true;
+      media[discussingIdx].discussionDate = discussingMedia.discussionDate;
     }
-  })
+  });
   res.send(media);
 };
 
@@ -165,7 +166,7 @@ const addMediaHandler = async (req, res) => {
 
 const addReviewByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (! (await accountModel.checkCookie(req.cookies.user_session, username))) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }

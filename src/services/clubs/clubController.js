@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import * as clubModel from './clubModel.js';
 import * as accountModel from '../accounts/accountModel.js';
 import logger from '../../logger.js';

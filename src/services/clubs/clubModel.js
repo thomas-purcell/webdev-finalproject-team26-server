@@ -29,11 +29,11 @@ export const createClubDiscussion = async (username, mediaType, mediaId) => {
   const { _id: memberId } = await accountModel.getUserByUsername(username);
   const discussion = {
     clubId: memberId,
-    discussionDate: "",
+    discussionDate: '',
     avgRating: 0,
     mediaType,
-    mediaId
-  }
+    mediaId,
+  };
   const result = await clubDao.createClubDiscussion(discussion);
   return result;
 };
