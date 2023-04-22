@@ -153,8 +153,6 @@ const clubController = (server) => {
   server.get('/profile/:username/clubs', getClubsByMemberUsernameHandler);
   server.get('/profile/:username/clubs/announcements', getClubAnnouncementsByUsernameHandler);
   server.get('/clubs/:clubUsername/newMembers', getNewMembersByClubHandler);
-  server.post('/clubs/:username/discussions/:mediaType/:mediaId', addClubDiscussionByClubHandler);
-  server.delete('/clubs/:username/discussions/:mediaType/:mediaId', deleteClubDiscussionByClubHandler);
   server.get('/clubs/:clubUsername/discussion/:mediaType/:mediaId', getClubDiscussionForMediaHandler);
   server.post('/clubs/:clubUsername/discussion/:mediaType/:mediaId', createCommentForClubDiscussionHandler);
   server.post('/clubs/:username/discussions/:mediaType/:mediaId', addClubDiscussionByClubHandler);
