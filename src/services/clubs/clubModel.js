@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import * as clubDao from './clubDao.js';
 import * as accountModel from '../accounts/accountModel.js';
+import * as mediaModel from '../media/mediaModel.js';
 // eslint-disable-next-line no-unused-vars
 import logger from '../../logger.js';
 
@@ -173,4 +174,25 @@ export const getClubDiscussionForMedia = async (clubUsername, mediaType, mediaId
 export const createDiscussionCommentForMedia = async (clubUsername, mediaType, mediaId, newComment) => {
   await clubDao.createDiscussionComment(newComment);
   return getClubDiscussionForMedia(clubUsername, mediaType, mediaId);
+};
+
+export const getRecentComments = async (clubUsername) => {
+  const club = await accountModel.getUserByUsername(clubUsername);
+  const comments = await clubDao.getCommentsForClub(club._id);
+  const sorted = comments.sort((a, b) => new Date(b) - new Date(a)).splice(0, 4);
+  const enrichedComments = await Promise.all(sorted.map(async (c) => {
+    const discussion = await clubDao.getDiscussionByDiscussionId(c.discussionId);
+    const media = await mediaModel.getMediaByMediaId(discussion.mediaType, discussion.mediaId);
+    const member = await accountModel.getAccountById(c.memberId);
+    return {
+      ...c,
+      poster: media.poster,
+      title: media.title,
+      mediaType: media.mediaType,
+      mediaId: media.mediaId,
+      username: member.username,
+      clubUsername: club.username,
+    };
+  }));
+  return enrichedComments;
 };
