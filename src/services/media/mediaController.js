@@ -20,18 +20,19 @@ const watchesByUserHandler = async (req, res) => {
 const mediaByUserHandler = async (req, res) => {
   const { username } = req.params;
   const { _id: userId } = await accountModel.getUserByUsername(username);
-  const [likes, watches, reviews] = await Promise.all([
+  const [likes, watches, reviews, discussing] = await Promise.all([
     mediaModel.getLikesByUser(userId),
     mediaModel.getWatchesByUser(userId),
     mediaModel.getReviewsByUser(userId),
+    mediaModel.getDiscussingByUser(userId),
   ]);
   const media = likes.map((l) => ({
-    ...l, liked: true, watched: false, reviewed: false,
+    ...l, liked: true, watched: false, reviewed: false, discussing: false,
   }));
   watches.forEach((watchedMedia) => {
     if (!media.map((m) => m.mediaId).includes(watchedMedia.mediaId)) {
       media.push({
-        ...watchedMedia, watched: true, liked: false, reviewed: false,
+        ...watchedMedia, watched: true, liked: false, reviewed: false, discussing: false,
       });
     } else {
       const watchedIdx = media.findIndex((m) => m.mediaId === watchedMedia.mediaId);
@@ -41,7 +42,7 @@ const mediaByUserHandler = async (req, res) => {
   reviews.forEach((reviewedMedia) => {
     if (!media.map((m) => m.mediaId).includes(reviewedMedia.mediaId)) {
       media.push({
-        ...reviewedMedia, watched: false, liked: false, reviewed: true,
+        ...reviewedMedia, watched: false, liked: false, reviewed: true, discussing: false,
       });
     } else {
       const reviewedIdx = media.findIndex((m) => m.mediaId === reviewedMedia.mediaId);
@@ -51,6 +52,16 @@ const mediaByUserHandler = async (req, res) => {
       reviewed.comment = reviewedMedia.comment;
     }
   });
+  discussing.forEach((discussingMedia) => {
+    if (!media.map((m) => m.mediaId).includes(discussingMedia.mediaId)) {
+      media.push({
+        ...discussingMedia, watched: false, liked: false, reviewed: false, discussing: true,
+      });
+    } else {
+      const discussingIdx = media.findIndex((m) => m.mediaId === discussingMedia.mediaId);
+      media[discussingIdx].discussing = true;
+    }
+  })
   res.send(media);
 };
 
@@ -73,11 +84,12 @@ const mediaByMediaIdHandler = async (req, res) => {
 const mediaByUsernameMediaIdHandler = async (req, res) => {
   const { mediaType, mediaId, username } = req.params;
   const { _id: userId } = await accountModel.getUserByUsername(username);
-  const [media, likes, watches, reviews] = await Promise.all([
+  const [media, likes, watches, reviews, discussing] = await Promise.all([
     mediaModel.getMediaByMediaId(mediaType, mediaId),
     mediaModel.getLikesByUser(userId),
     mediaModel.getWatchesByUser(userId),
     mediaModel.getReviewsByUser(userId),
+    mediaModel.getDiscussingByUser(userId),
   ]);
   if (!media) {
     res.sendStatus(403);
@@ -88,6 +100,7 @@ const mediaByUsernameMediaIdHandler = async (req, res) => {
     ...media,
     liked: !!likes.find((l) => l.mediaId === mediaId),
     watched: !!watches.find((l) => l.mediaId === mediaId),
+    discussing: !!discussing.find((l) => l.mediaId === mediaId),
     reviewed: !!review,
     rating: review?.rating,
     comment: review?.comment,
