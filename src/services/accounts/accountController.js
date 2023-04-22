@@ -10,14 +10,14 @@ const cookieOptions = {
 
 const registrationHandler = async (req, res) => {
   const cookie = await accountModel.registerNewUser(req.body);
-  const user = accountModel.getLoggedInUser(cookie);
+  const user = await accountModel.getLoggedInUser(cookie);
   res.cookie('user_session', cookie, cookieOptions);
   res.send({ profile: user.account });
 };
 
 const loginHandler = async (req, res) => {
   // Check if the user is already logged in with a cookie
-  const user = accountModel.getLoggedInUser(req.cookies.user_session);
+  const user = await accountModel.getLoggedInUser(req.cookies.user_session);
   if (user) {
     res.send({ profile: user.account });
     return;
@@ -34,7 +34,7 @@ const loginHandler = async (req, res) => {
     res.sendStatus(403);
     return;
   }
-  const { account } = accountModel.getLoggedInUser(cookie);
+  const { account } = await accountModel.getLoggedInUser(cookie);
 
   // If the log in was successful, then send the user their cookie and a 200
   res.cookie('user_session', cookie, cookieOptions);
@@ -54,7 +54,7 @@ const profileHandler = async (req, res) => {
 
 const updateProfileHandler = async (req, res) => {
   const { username } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }

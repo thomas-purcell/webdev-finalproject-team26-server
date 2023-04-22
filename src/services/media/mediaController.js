@@ -110,7 +110,7 @@ const mediaByUsernameMediaIdHandler = async (req, res) => {
 
 const addWatchByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -121,7 +121,7 @@ const addWatchByUsernameMediaIdHandler = async (req, res) => {
 
 const deleteWatchByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -132,7 +132,7 @@ const deleteWatchByUsernameMediaIdHandler = async (req, res) => {
 
 const addLikeByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -143,7 +143,7 @@ const addLikeByUsernameMediaIdHandler = async (req, res) => {
 
 const deleteLikeByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -165,7 +165,7 @@ const addMediaHandler = async (req, res) => {
 
 const addReviewByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (! (await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
