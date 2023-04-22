@@ -58,9 +58,9 @@ const addClubDiscussionByClubHandler = async (req, res) => {
 }
 
 const deleteClubDiscussionByClubHandler = async (req, res) => {
-  // const { username, mediaType, mediaId } = req.params;
-  // const result = await clubModel.createClubDiscussion(username, mediaType, mediaId);
-  // res.send(result);
+  const { username, mediaType, mediaId } = req.params;
+  const result = await clubModel.deleteClubDiscussion(username, mediaType, mediaId);
+  res.send(result);
 }
 
 const clubController = (server) => {

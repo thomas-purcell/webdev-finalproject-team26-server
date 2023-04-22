@@ -37,8 +37,10 @@ export const createClubDiscussion = async (username, mediaType, mediaId) => {
   return result;
 };
 
-export const deleteClubDiscussion = async (discussionId) => {
-  const result = await clubDao.deleteClubDiscussion(discussionId);
+export const deleteClubDiscussion = async (username, mediaType, mediaId) => {
+  const { _id: clubId } = await accountModel.getUserByUsername(username);
+  const discussion = await clubDao.getClubDiscussionByMedia(clubId, mediaType, mediaId);
+  const result = await clubDao.deleteClubDiscussion(discussion._id);
   return result;
 };
 
