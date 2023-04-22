@@ -24,11 +24,9 @@ export const registerUser = async (newAccountInfo) => {
 };
 
 export const updateUser = async (updateAccountInfo) => {
-  logger.info(updateAccountInfo);
-  const result = await accountModel.updateOne(
-    { username: updateAccountInfo.oldUsername },
-    updateAccountInfo,
-  ).lean();
+  const accountId = updateAccountInfo._id;
+  delete updateAccountInfo._id;
+  const result = await accountModel.updateOne({_id : accountId},updateAccountInfo).lean();
   logger.info(result);
   return result;
 };

@@ -63,6 +63,18 @@ const createCommentForClubDiscussionHandler = async (req, res) => {
   res.send(result);
 };
 
+const addClubDiscussionByClubHandler = async (req, res) => {
+  const { username, mediaType, mediaId } = req.params;
+  const result = await clubModel.createClubDiscussion(username, mediaType, mediaId);
+  res.send(result);
+}
+
+const deleteClubDiscussionByClubHandler = async (req, res) => {
+  // const { username, mediaType, mediaId } = req.params;
+  // const result = await clubModel.createClubDiscussion(username, mediaType, mediaId);
+  // res.send(result);
+}
+
 const clubController = (server) => {
   server.get('/clubs', getClubsHandler);
   server.get('/clubs/popular', getPopularClubsHandler);
@@ -74,6 +86,8 @@ const clubController = (server) => {
   server.get('/clubs/:clubUsername/newMembers', getNewMembersByClubHandler);
   server.get('/clubs/:clubUsername/discussion/:mediaType/:mediaId', getClubDiscussionForMediaHandler);
   server.post('/clubs/:clubUsername/discussion/:mediaType/:mediaId', createCommentForClubDiscussionHandler);
+  server.post('/clubs/:username/discussions/:mediaType/:mediaId', addClubDiscussionByClubHandler);
+  server.delete('/clubs/:username/discussions/:mediaType/:mediaId', deleteClubDiscussionByClubHandler);
 };
 
 export default clubController;
