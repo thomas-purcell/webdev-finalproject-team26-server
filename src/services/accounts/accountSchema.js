@@ -9,12 +9,7 @@ const schema = mongoose.Schema({
   lastName: String,
   orgName: String,
   bio: String,
-  contacts: [
-    {
-      type: String,
-      value: String,
-    },
-  ],
+  contacts: Array,
   watchMovies: Boolean,
   watchAnime: Boolean,
   watchTv: Boolean,
