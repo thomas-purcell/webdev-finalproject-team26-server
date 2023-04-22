@@ -93,7 +93,7 @@ const clubController = (server) => {
   server.post('/clubs/:username/discussions/:mediaType/:mediaId', addClubDiscussionByClubHandler);
   server.delete('/clubs/:username/discussions/:mediaType/:mediaId', deleteClubDiscussionByClubHandler);
   server.get('/clubs/:clubUsername/discussion/:mediaType/:mediaId', getClubDiscussionForMediaHandler);
-  server.post('/clubs/:clubUsername/discussion/:mediaType/:mediaId', createCommentForClubDiscussionHandler);
+  server.post('/clubs/:clubUsername/discussion/:mediaType/:mediaId/comment', createCommentForClubDiscussionHandler);
   server.get('/clubs/:clubUsername/recentComments', getRecentCommentsForClubHandler);
 };
 
