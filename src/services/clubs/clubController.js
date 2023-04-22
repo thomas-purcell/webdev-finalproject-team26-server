@@ -41,6 +41,16 @@ const getClubAnnouncementsByUsernameHandler = async (req, res) => {
   res.send(result);
 };
 
+const getClubDiscussionForMediaHandler = async (req, res) => {
+  const { clubUsername, mediaType, mediaId } = req.params;
+  try {
+    const result = await clubModel.getClubDiscussionForMedia(clubUsername, mediaType, mediaId);
+    res.send(result);
+  } catch {
+    res.send(400);
+  }
+};
+
 const clubController = (server) => {
   server.get('/clubs', getClubsHandler);
   server.get('/clubs/popular', getPopularClubsHandler);
@@ -50,6 +60,7 @@ const clubController = (server) => {
   server.get('/profile/:username/clubs', getClubsByMemberUsernameHandler);
   server.get('/profile/:username/clubs/announcements', getClubAnnouncementsByUsernameHandler);
   server.get('/clubs/:clubUsername/newMembers', getNewMembersByClubHandler);
+  server.get('/clubs/:clubUsername/discussion/:mediaType/:mediaId', getClubDiscussionForMediaHandler);
 };
 
 export default clubController;

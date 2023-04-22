@@ -1,6 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 import * as clubDao from './clubDao.js';
 import * as accountModel from '../accounts/accountModel.js';
+// eslint-disable-next-line no-unused-vars
+import logger from '../../logger.js';
 
 export const getClubAnnouncements = async (clubId) => {
   const announcements = await clubDao.getClubAnnouncements(clubId);
@@ -125,4 +127,35 @@ export const getClubAnnouncementsForUser = async (username) => {
     }));
   }));
   return announcements.flat();
+};
+
+const getReplies = (parent, comments) => {
+  const replies = comments.filter((child) => parent._id.toString() === child.replyToId);
+  if (replies) {
+    return replies.map((c) => ({
+      ...c,
+      replies: getReplies(c, comments),
+    }));
+  }
+  return replies;
+};
+
+const transformComments = (comments) => {
+  const parents = comments.filter((c) => c.replyToId === null);
+  const result = parents.map((parent) => ({
+    ...parent,
+    replies: getReplies(parent, comments),
+  }));
+  return result;
+};
+
+export const getClubDiscussionForMedia = async (clubUsername, mediaType, mediaId) => {
+  const { _id: clubId } = await accountModel.getUserByUsername(clubUsername);
+  const discussion = await clubDao.getClubDiscussionByMedia(clubId, mediaType, mediaId);
+  const comments = await clubDao.getDiscussionCommentsByDiscussion(discussion._id);
+  const transformedComments = transformComments(comments);
+  return {
+    ...discussion,
+    comments: transformedComments,
+  };
 };

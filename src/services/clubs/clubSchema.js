@@ -19,3 +19,12 @@ export const clubMembersSchema = mongoose.Schema({
   memberId: String,
   joinedDate: String,
 }, { collection: 'clubMembers' });
+
+export const discussionCommentsSchema = mongoose.Schema({
+  clubId: String,
+  discussionId: String,
+  memberId: String,
+  timestamp: String,
+  comment: String,
+  replyToId: String,
+}, { collection: 'discussionComments' });

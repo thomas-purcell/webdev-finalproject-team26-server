@@ -1,12 +1,14 @@
 import mongoose from 'mongoose';
 import {
-  clubAnnouncementsSchema, clubDiscussionsSchema, clubMembersSchema,
+  clubAnnouncementsSchema, clubDiscussionsSchema, clubMembersSchema, discussionCommentsSchema,
 } from './clubSchema.js';
+// eslint-disable-next-line no-unused-vars
 import logger from '../../logger.js';
 
 export const clubAnnouncementsModel = mongoose.model('ClubAnnouncementsModel', clubAnnouncementsSchema);
 export const clubDiscussionsModel = mongoose.model('ClubDiscussionsModel', clubDiscussionsSchema);
 export const clubMembersModel = mongoose.model('ClubMembersModel', clubMembersSchema);
+export const discussionCommentsModel = mongoose.model('DiscussionCommentsModel', discussionCommentsSchema);
 
 export const getClubAnnouncements = async (clubId) => {
   const announcements = await clubAnnouncementsModel.find({ clubId }).lean();
@@ -54,8 +56,16 @@ export const deleteClubMember = async (memberId, clubId) => {
 };
 
 export const getClubsByMemberId = async (memberId) => {
-  logger.info(memberId);
   const clubs = await clubMembersModel.find({ memberId }).lean();
-  logger.info(clubs);
   return clubs;
+};
+
+export const getClubDiscussionByMedia = async (clubId, mediaType, mediaId) => {
+  const result = await clubDiscussionsModel.findOne({ clubId, mediaType, mediaId }).lean();
+  return result;
+};
+
+export const getDiscussionCommentsByDiscussion = async (discussionId) => {
+  const result = await discussionCommentsModel.find({ discussionId }).lean();
+  return result;
 };
