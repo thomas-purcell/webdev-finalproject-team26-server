@@ -129,22 +129,31 @@ export const getClubAnnouncementsForUser = async (username) => {
   return announcements.flat();
 };
 
-const getReplies = (parent, comments) => {
+const getReplies = async (parent, comments) => {
   const replies = comments.filter((child) => parent._id.toString() === child.replyToId);
   if (replies) {
-    return replies.map((c) => ({
-      ...c,
-      replies: getReplies(c, comments),
+    const result = await Promise.all(replies.map(async (c) => {
+      const { username } = await accountModel.getAccountById(parent.memberId);
+      return {
+        ...c,
+        username,
+        replies: await getReplies(c, comments),
+      };
     }));
+    return result;
   }
   return replies;
 };
 
-const transformComments = (comments) => {
+const transformComments = async (comments) => {
   const parents = comments.filter((c) => c.replyToId === null);
-  const result = parents.map((parent) => ({
-    ...parent,
-    replies: getReplies(parent, comments),
+  const result = await Promise.all(parents.map(async (parent) => {
+    const { username } = await accountModel.getAccountById(parent.memberId);
+    return {
+      ...parent,
+      username,
+      replies: await getReplies(parent, comments),
+    };
   }));
   return result;
 };
@@ -153,7 +162,7 @@ export const getClubDiscussionForMedia = async (clubUsername, mediaType, mediaId
   const { _id: clubId } = await accountModel.getUserByUsername(clubUsername);
   const discussion = await clubDao.getClubDiscussionByMedia(clubId, mediaType, mediaId);
   const comments = await clubDao.getDiscussionCommentsByDiscussion(discussion._id);
-  const transformedComments = transformComments(comments);
+  const transformedComments = await transformComments(comments);
   return {
     ...discussion,
     comments: transformedComments,
