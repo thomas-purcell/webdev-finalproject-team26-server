@@ -127,6 +127,23 @@ const deleteClubAnnouncement = async (req, res) => {
   res.send(result);
 }
 
+const createClubMember = async (req, res) => {
+  const newMember = req.body;
+  
+  const result = await clubModel.createClubMember(newMember);
+  res.send(result);
+}
+
+const deleteClubMember = async (req, res) => {
+  const { memberId, clubId } = req.params;
+
+  logger.info("Member id: " + memberId);
+  logger.info("Club id: " + clubId);
+  
+  const result = await clubModel.deleteClubMember(memberId, clubId);
+  res.send(result);
+}
+
 const clubController = (server) => {
   server.get('/clubs', getClubsHandler);
   server.get('/clubs/popular', getPopularClubsHandler);
@@ -146,6 +163,8 @@ const clubController = (server) => {
   server.get('/clubs/:clubUsername/announcements', getClubAnnouncementsHandler);
   server.post('/clubs/announcement', createClubAnnouncement);
   server.delete('/clubs/announcement/:announcementId', deleteClubAnnouncement);
+  server.post('/clubs/members', createClubMember)
+  server.delete('/clubs/:clubId/members/:memberId', deleteClubMember)
 };
 
 export default clubController;
