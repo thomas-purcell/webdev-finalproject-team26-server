@@ -25,12 +25,31 @@ const getClubsByMemberUsernameHandler = async (req, res) => {
   res.send(result);
 };
 
+const getNewMembersByClubHandler = async (req, res) => {
+  const result = await clubModel.getNewMembersByClub(req.params.clubUsername);
+  res.send(result);
+};
+
+const getPopularClubsHandler = async (req, res) => {
+  const result = await clubModel.getPopularClubs();
+  res.send(result);
+};
+
+const getClubAnnouncementsByUsernameHandler = async (req, res) => {
+  const { username } = req.params;
+  const result = await clubModel.getClubAnnouncementsForUser(username);
+  res.send(result);
+};
+
 const clubController = (server) => {
   server.get('/clubs', getClubsHandler);
+  server.get('/clubs/popular', getPopularClubsHandler);
   server.get('/clubs/:clubUsername', getClubByClubIdHandler);
   server.post('/clubs', createClubsHandler);
   server.delete('/clubs/:clubUsername', deleteClubsHandler);
   server.get('/profile/:username/clubs', getClubsByMemberUsernameHandler);
+  server.get('/profile/:username/clubs/announcements', getClubAnnouncementsByUsernameHandler);
+  server.get('/clubs/:clubUsername/newMembers', getNewMembersByClubHandler);
 };
 
 export default clubController;

@@ -86,3 +86,43 @@ export const getClubsByMemberUsername = async (memberUsername) => {
   const result = await Promise.all(clubPromises);
   return result;
 };
+
+export const getNewMembersByClub = async (clubUsername) => {
+  const club = await accountModel.getUserByUsername(clubUsername);
+  const members = await clubDao.getClubMembers(club._id);
+  const sortedMembers = members.sort((a, b) => new Date(b) - new Date(a)).splice(0, 3);
+  const enrichedMembers = await Promise.all(sortedMembers.map(async (member) => {
+    const profile = await accountModel.getAccountById(member.memberId);
+    return {
+      ...member,
+      username: profile.username,
+    };
+  }));
+  return enrichedMembers;
+};
+
+export const getPopularClubs = async () => {
+  const clubs = await getClubs();
+  const enrichedClubs = await Promise.all(clubs.map(async (club) => ({
+    username: club.username,
+    orgName: club.orgName,
+    numMembers: club.members.length,
+  })));
+  const sortedClubs = enrichedClubs.sort((a, b) => b.numMembers - a.numMembers);
+  return sortedClubs.splice(0, 3);
+};
+
+export const getClubAnnouncementsForUser = async (username) => {
+  const { _id: memberId } = await accountModel.getUserByUsername(username);
+  const clubs = await clubDao.getClubsByMemberId(memberId);
+  const announcements = await Promise.all(clubs.map(async (club) => {
+    const clubInfo = await accountModel.getAccountById(club.clubId);
+    const clubAnnouncements = await clubDao.getClubAnnouncements(club.clubId);
+    return clubAnnouncements.map((announcement) => ({
+      orgName: clubInfo.orgName,
+      username: clubInfo.username,
+      ...announcement,
+    }));
+  }));
+  return announcements.flat();
+};
