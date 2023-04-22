@@ -159,3 +159,9 @@ export const getClubDiscussionForMedia = async (clubUsername, mediaType, mediaId
     comments: transformedComments,
   };
 };
+
+// eslint-disable-next-line max-len
+export const createDiscussionCommentForMedia = async (clubUsername, mediaType, mediaId, newComment) => {
+  await clubDao.createDiscussionComment(newComment);
+  return getClubDiscussionForMedia(clubUsername, mediaType, mediaId);
+};

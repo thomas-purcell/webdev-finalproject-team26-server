@@ -69,3 +69,8 @@ export const getDiscussionCommentsByDiscussion = async (discussionId) => {
   const result = await discussionCommentsModel.find({ discussionId }).lean();
   return result;
 };
+
+export const createDiscussionComment = async (newComment) => {
+  const result = await discussionCommentsModel.create(newComment);
+  return result;
+};

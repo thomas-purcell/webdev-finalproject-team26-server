@@ -56,6 +56,7 @@ const updateProfileHandler = async (req, res) => {
   const { username } = req.params;
   if (!accountModel.checkCookie(req.cookies.user_session, username)) {
     res.sendStatus(403);
+    return;
   }
   const updateAccountInfo = req.body;
   if (updateAccountInfo.password.length === 0) {

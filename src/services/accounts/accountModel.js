@@ -65,7 +65,6 @@ export const getLoggedInUser = (cookie) => {
 
 export const getUserByUsername = async (username) => {
   const account = await accountDao.getAccountByUsername(username, false);
-  logger.info(account);
   return account;
 };
 
