@@ -1,5 +1,6 @@
 import * as mediaDao from './mediaDao.js';
 import * as accountModel from '../accounts/accountModel.js';
+import * as clubDao from '../clubs/clubDao.js';
 import logger from '../../logger.js';
 
 export const getLikesByUser = async (userId) => {
@@ -16,6 +17,11 @@ export const getReviewsByUser = async (userId) => {
   const reviews = await mediaDao.getReviewsByUserId(userId);
   return reviews.map((w) => ({ ...w, reviewed: true }));
 };
+
+export const getDiscussingByUser = async (userId) => {
+  const dicussing = await clubDao.getClubDiscussions(userId);
+  return dicussing.map((w) => ({ ... w, discussing: true}));
+}
 
 export const getMediaByMediaId = async (mediaType, mediaId) => {
   const media = await mediaDao.getMediaByMediaId(mediaType, mediaId);

@@ -41,6 +41,18 @@ const getClubAnnouncementsByUsernameHandler = async (req, res) => {
   res.send(result);
 };
 
+const addClubDiscussionByClubHandler = async (req, res) => {
+  const { username, mediaType, mediaId } = req.params;
+  const result = await clubModel.createClubDiscussion(username, mediaType, mediaId);
+  res.send(result);
+}
+
+const deleteClubDiscussionByClubHandler = async (req, res) => {
+  // const { username, mediaType, mediaId } = req.params;
+  // const result = await clubModel.createClubDiscussion(username, mediaType, mediaId);
+  // res.send(result);
+}
+
 const getClubDiscussionForMediaHandler = async (req, res) => {
   const { clubUsername, mediaType, mediaId } = req.params;
   try {
@@ -78,6 +90,8 @@ const clubController = (server) => {
   server.get('/profile/:username/clubs', getClubsByMemberUsernameHandler);
   server.get('/profile/:username/clubs/announcements', getClubAnnouncementsByUsernameHandler);
   server.get('/clubs/:clubUsername/newMembers', getNewMembersByClubHandler);
+  server.post('/clubs/:username/discussions/:mediaType/:mediaId', addClubDiscussionByClubHandler);
+  server.delete('/clubs/:username/discussions/:mediaType/:mediaId', deleteClubDiscussionByClubHandler);
   server.get('/clubs/:clubUsername/discussion/:mediaType/:mediaId', getClubDiscussionForMediaHandler);
   server.post('/clubs/:clubUsername/discussion/:mediaType/:mediaId', createCommentForClubDiscussionHandler);
   server.get('/clubs/:clubUsername/recentComments', getRecentCommentsForClubHandler);

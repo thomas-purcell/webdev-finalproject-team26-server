@@ -25,7 +25,15 @@ export const getClubDiscussions = async (clubId) => {
   return discussions;
 };
 
-export const createClubDiscussion = async (discussion) => {
+export const createClubDiscussion = async (username, mediaType, mediaId) => {
+  const { _id: memberId } = await accountModel.getUserByUsername(username);
+  const discussion = {
+    clubId: memberId,
+    discussionDate: "",
+    avgRating: 0,
+    mediaType,
+    mediaId
+  }
   const result = await clubDao.createClubDiscussion(discussion);
   return result;
 };
