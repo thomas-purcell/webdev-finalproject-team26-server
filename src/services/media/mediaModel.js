@@ -79,3 +79,43 @@ export const getReviewsByMediaId = async (mediaType, mediaId) => {
   }));
   return enrichedResults;
 };
+
+export const getRecentReviews = async () => {
+  const result = await mediaDao.getReviews();
+  const sortedReviews = result.sort(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+  ).splice(0, 4);
+
+  const enrichedResults = await Promise.all(sortedReviews.map(async (media) => {
+    const { username } = await accountModel.getAccountById(media.userId);
+    const enrichedMedia = await mediaDao.getMediaByMediaId(media.mediaType, media.mediaId);
+    return {
+      ...media,
+      username,
+      poster: enrichedMedia.poster,
+      title: enrichedMedia.title,
+    };
+  }));
+  return enrichedResults;
+};
+
+export const getRecentlyReviewedByLiked = async (username) => {
+  const { _id: userId } = await accountModel.getUserByUsername(username);
+  const likedMedia = await getLikesByUser(userId);
+  const reviewedMedia = await Promise.all(
+    likedMedia.map(async (media) => {
+      const reviews = await getReviewsByMediaId(media.mediaType, media.mediaId);
+      return reviews;
+    }),
+  );
+  const enriched = await Promise.all(reviewedMedia.flat().map(async (media) => {
+    const enrichedMedia = await mediaDao.getMediaByMediaId(media.mediaType, media.mediaId);
+    return {
+      ...media,
+      poster: enrichedMedia.poster,
+      title: enrichedMedia.title,
+    };
+  }));
+  const sorted = enriched.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  return sorted.splice(0, 4);
+};

@@ -66,3 +66,8 @@ export const addMedia = async (media) => {
   const result = await mediaModel.create(media);
   return result;
 };
+
+export const getReviews = async () => {
+  const result = await reviewsModel.find().lean();
+  return result;
+};

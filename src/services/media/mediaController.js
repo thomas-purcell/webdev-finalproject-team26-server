@@ -167,8 +167,20 @@ const getReviewsByMediaIdHandler = async (req, res) => {
   res.send(result);
 };
 
+const getRecentReviewsHandler = async (req, res) => {
+  const result = await mediaModel.getRecentReviews();
+  res.send(result);
+};
+
+const recentlyReviewedByLikedHandler = async (req, res) => {
+  const { username } = req.params;
+  const result = await mediaModel.getRecentlyReviewedByLiked(username);
+  res.send(result);
+};
+
 const mediaController = (server) => {
   server.get('/profile/:username/likes', likesByUserHandler);
+  server.get('/profile/:username/likes/recentlyReviewed', recentlyReviewedByLikedHandler);
   server.get('/profile/:username/watches', watchesByUserHandler);
   server.get('/profile/:username/media', mediaByUserHandler);
   server.get('/profile/:username/media/:mediaType/:mediaId', mediaByUsernameMediaIdHandler);
@@ -178,6 +190,7 @@ const mediaController = (server) => {
   server.delete('/profile/:username/likes/:mediaType/:mediaId', deleteLikeByUsernameMediaIdHandler);
   server.post('/profile/:username/reviews/:mediaType/:mediaId', addReviewByUsernameMediaIdHandler);
   server.post('/media', addMediaHandler);
+  server.get('/media/reviews/recent', getRecentReviewsHandler);
   server.get('/media/:mediaType/:mediaId', mediaByMediaIdHandler);
   server.get('/media/:mediaType/:mediaId/reviews', getReviewsByMediaIdHandler);
 };
