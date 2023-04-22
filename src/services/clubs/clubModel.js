@@ -1,6 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import * as clubDao from './clubDao.js';
 import * as accountModel from '../accounts/accountModel.js';
+import * as mediaModel from '../media/mediaModel.js';
+// eslint-disable-next-line no-unused-vars
+import logger from '../../logger.js';
 
 export const getClubAnnouncements = async (clubId) => {
   const announcements = await clubDao.getClubAnnouncements(clubId);
@@ -26,18 +29,30 @@ export const createClubDiscussion = async (username, mediaType, mediaId) => {
   const { _id: memberId } = await accountModel.getUserByUsername(username);
   const discussion = {
     clubId: memberId,
-    discussionDate: "",
+    discussionDate: '',
     avgRating: 0,
     mediaType,
-    mediaId
-  }
+    mediaId,
+  };
   const result = await clubDao.createClubDiscussion(discussion);
   return result;
 };
 
-export const deleteClubDiscussion = async (discussionId) => {
-  const result = await clubDao.deleteClubDiscussion(discussionId);
+export const deleteClubDiscussion = async (username, mediaType, mediaId) => {
+  const { _id: clubId } = await accountModel.getUserByUsername(username);
+  const discussion = await clubDao.getClubDiscussionByMedia(clubId, mediaType, mediaId);
+  const result = await clubDao.deleteClubDiscussion(discussion._id);
   return result;
+};
+
+export const updateClubDiscussion = async (updateDiscussionInfo) => {
+  const discussionId = updateDiscussionInfo._id;
+  logger.info(updateDiscussionInfo);
+  await clubDao.updateDiscussion(updateDiscussionInfo);
+  const discussion = await clubDao.getDiscussionByDiscussionId(discussionId);
+  logger.info(discussionId);
+  logger.info(discussion);
+  return discussion;
 };
 
 export const getClubMembers = async (clubId) => {
@@ -133,4 +148,71 @@ export const getClubAnnouncementsForUser = async (username) => {
     }));
   }));
   return announcements.flat();
+};
+
+const getReplies = async (parent, comments) => {
+  const replies = comments.filter((child) => parent._id.toString() === child.replyToId);
+  if (replies) {
+    const result = await Promise.all(replies.map(async (c) => {
+      const { username } = await accountModel.getAccountById(parent.memberId);
+      return {
+        ...c,
+        username,
+        replies: await getReplies(c, comments),
+      };
+    }));
+    return result;
+  }
+  return replies;
+};
+
+const transformComments = async (comments) => {
+  const parents = comments.filter((c) => c.replyToId === null);
+  const result = await Promise.all(parents.map(async (parent) => {
+    const { username } = await accountModel.getAccountById(parent.memberId);
+    return {
+      ...parent,
+      username,
+      replies: await getReplies(parent, comments),
+    };
+  }));
+  return result;
+};
+
+export const getClubDiscussionForMedia = async (clubUsername, mediaType, mediaId) => {
+  const { _id: clubId } = await accountModel.getUserByUsername(clubUsername);
+  const discussion = await clubDao.getClubDiscussionByMedia(clubId, mediaType, mediaId);
+  const comments = await clubDao.getDiscussionCommentsByDiscussion(discussion._id);
+  const transformedComments = await transformComments(comments);
+  return {
+    ...discussion,
+    comments: transformedComments,
+  };
+};
+
+// eslint-disable-next-line max-len
+export const createDiscussionCommentForMedia = async (clubUsername, mediaType, mediaId, newComment) => {
+  await clubDao.createDiscussionComment(newComment);
+  return getClubDiscussionForMedia(clubUsername, mediaType, mediaId);
+};
+
+export const getRecentComments = async (clubUsername) => {
+  const club = await accountModel.getUserByUsername(clubUsername);
+  const comments = await clubDao.getCommentsForClub(club._id);
+  const sorted = comments.sort((a, b) => new Date(b) - new Date(a)).splice(0, 4);
+  const enrichedComments = await Promise.all(sorted.map(async (c) => {
+    const discussion = await clubDao.getDiscussionByDiscussionId(c.discussionId);
+    const media = await mediaModel.getMediaByMediaId(discussion.mediaType, discussion.mediaId);
+    const member = await accountModel.getAccountById(c.memberId);
+    return {
+      ...c,
+      poster: media.poster,
+      title: media.title,
+      mediaType: media.mediaType,
+      mediaId: media.mediaId,
+      username: member.username,
+      clubUsername: club.username,
+    };
+  }));
+  return enrichedComments;
 };

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { randomUUID } from 'crypto';
 import logger from '../../logger.js';
 import * as accountDao from './accountDao.js';
@@ -58,19 +59,24 @@ export const logUserOut = (cookie) => {
   }
 };
 
-export const getLoggedInUser = (cookie) => {
-  const account = loggedInUsers.find((user) => user.cookie === cookie);
-  return account;
+export const getLoggedInUser = async (cookie) => {
+  const accountFound = loggedInUsers.find((user) => user.cookie === cookie);
+
+  if (accountFound) {
+    const accountId = accountFound.account._id.toString();
+    const account = await accountDao.getAccountById(accountId);
+    return { cookie, account };
+  }
+  return accountFound;
 };
 
 export const getUserByUsername = async (username) => {
   const account = await accountDao.getAccountByUsername(username, false);
-  logger.info(account);
   return account;
 };
 
-export const checkCookie = (cookie, username) => {
-  const user = getLoggedInUser(cookie);
+export const checkCookie = async (cookie, username) => {
+  const user = await getLoggedInUser(cookie);
   return user?.account.username === username;
 };
 

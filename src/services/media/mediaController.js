@@ -60,8 +60,9 @@ const mediaByUserHandler = async (req, res) => {
     } else {
       const discussingIdx = media.findIndex((m) => m.mediaId === discussingMedia.mediaId);
       media[discussingIdx].discussing = true;
+      media[discussingIdx].discussionDate = discussingMedia.discussionDate;
     }
-  })
+  });
   res.send(media);
 };
 
@@ -110,7 +111,7 @@ const mediaByUsernameMediaIdHandler = async (req, res) => {
 
 const addWatchByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -121,7 +122,7 @@ const addWatchByUsernameMediaIdHandler = async (req, res) => {
 
 const deleteWatchByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -132,7 +133,7 @@ const deleteWatchByUsernameMediaIdHandler = async (req, res) => {
 
 const addLikeByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -143,7 +144,7 @@ const addLikeByUsernameMediaIdHandler = async (req, res) => {
 
 const deleteLikeByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -165,7 +166,7 @@ const addMediaHandler = async (req, res) => {
 
 const addReviewByUsernameMediaIdHandler = async (req, res) => {
   const { username, mediaType, mediaId } = req.params;
-  if (!accountModel.checkCookie(req.cookies.user_session, username)) {
+  if (!(await accountModel.checkCookie(req.cookies.user_session, username))) {
     res.sendStatus(403);
     return;
   }
@@ -191,6 +192,12 @@ const recentlyReviewedByLikedHandler = async (req, res) => {
   res.send(result);
 };
 
+const getAverageRatingByMediaIdHandler = async (req, res) => {
+  const { mediaType, mediaId } = req.params;
+  const result = await mediaModel.getAverageRatingByMediaId(mediaType, mediaId);
+  res.send({ rating: result });
+};
+
 const mediaController = (server) => {
   server.get('/profile/:username/likes', likesByUserHandler);
   server.get('/profile/:username/likes/recentlyReviewed', recentlyReviewedByLikedHandler);
@@ -205,6 +212,7 @@ const mediaController = (server) => {
   server.post('/media', addMediaHandler);
   server.get('/media/reviews/recent', getRecentReviewsHandler);
   server.get('/media/:mediaType/:mediaId', mediaByMediaIdHandler);
+  server.get('/media/:mediaType/:mediaId/rating', getAverageRatingByMediaIdHandler);
   server.get('/media/:mediaType/:mediaId/reviews', getReviewsByMediaIdHandler);
 };
 
