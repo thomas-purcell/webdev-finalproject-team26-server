@@ -40,6 +40,14 @@ export const deleteClubDiscussion = async (discussionId) => {
   return result;
 };
 
+export const updateDiscussion = async (updateDiscussionInfo) => {
+  const discussionId = updateDiscussionInfo._id;
+  delete updateDiscussionInfo._id;
+  const result = await clubDiscussionsModel.updateOne({_id : discussionId},updateDiscussionInfo).lean();
+  logger.info(result);
+  return result;
+};
+
 export const getClubMembers = async (clubId) => {
   const members = await clubMembersModel.find({ clubId }).lean();
   return members;

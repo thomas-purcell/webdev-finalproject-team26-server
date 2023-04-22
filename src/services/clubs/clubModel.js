@@ -45,6 +45,16 @@ export const deleteClubDiscussion = async (username, mediaType, mediaId) => {
   return result;
 };
 
+export const updateClubDiscussion = async (updateDiscussionInfo) => {
+  const discussionId = updateDiscussionInfo._id;
+  logger.info(updateDiscussionInfo);
+  await clubDao.updateDiscussion(updateDiscussionInfo);
+  const discussion = await clubDao.getDiscussionByDiscussionId(discussionId);
+  logger.info(discussionId);
+  logger.info(discussion);
+  return discussion;
+};
+
 export const getClubMembers = async (clubId) => {
   const members = await clubDao.getClubMembers(clubId);
   return members;
