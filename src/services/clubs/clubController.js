@@ -75,6 +75,12 @@ const deleteClubDiscussionByClubHandler = async (req, res) => {
   // res.send(result);
 }
 
+const getRecentCommentsForClubHandler = async (req, res) => {
+  const { clubUsername } = req.params;
+  const result = await clubModel.getRecentComments(clubUsername);
+  res.send(result);
+};
+
 const clubController = (server) => {
   server.get('/clubs', getClubsHandler);
   server.get('/clubs/popular', getPopularClubsHandler);
@@ -88,6 +94,7 @@ const clubController = (server) => {
   server.post('/clubs/:clubUsername/discussion/:mediaType/:mediaId', createCommentForClubDiscussionHandler);
   server.post('/clubs/:username/discussions/:mediaType/:mediaId', addClubDiscussionByClubHandler);
   server.delete('/clubs/:username/discussions/:mediaType/:mediaId', deleteClubDiscussionByClubHandler);
+  server.get('/clubs/:clubUsername/recentComments', getRecentCommentsForClubHandler);
 };
 
 export default clubController;

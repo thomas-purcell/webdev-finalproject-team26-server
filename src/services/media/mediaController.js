@@ -191,6 +191,12 @@ const recentlyReviewedByLikedHandler = async (req, res) => {
   res.send(result);
 };
 
+const getAverageRatingByMediaIdHandler = async (req, res) => {
+  const { mediaType, mediaId } = req.params;
+  const result = await mediaModel.getAverageRatingByMediaId(mediaType, mediaId);
+  res.send({ rating: result });
+};
+
 const mediaController = (server) => {
   server.get('/profile/:username/likes', likesByUserHandler);
   server.get('/profile/:username/likes/recentlyReviewed', recentlyReviewedByLikedHandler);
@@ -205,6 +211,7 @@ const mediaController = (server) => {
   server.post('/media', addMediaHandler);
   server.get('/media/reviews/recent', getRecentReviewsHandler);
   server.get('/media/:mediaType/:mediaId', mediaByMediaIdHandler);
+  server.get('/media/:mediaType/:mediaId/rating', getAverageRatingByMediaIdHandler);
   server.get('/media/:mediaType/:mediaId/reviews', getReviewsByMediaIdHandler);
 };
 
