@@ -58,9 +58,17 @@ export const logUserOut = (cookie) => {
   }
 };
 
-export const getLoggedInUser = (cookie) => {
-  const account = loggedInUsers.find((user) => user.cookie === cookie);
-  return account;
+export const getLoggedInUser = async (cookie) => {
+  const accountFound = loggedInUsers.find((user) => user.cookie === cookie);
+
+  if (accountFound) {
+    const accountId = accountFound.account._id.toString();
+    const account = await accountDao.getAccountById(accountId);
+    return { cookie, account };
+  } else {
+    return accountFound;
+  }
+  
 };
 
 export const getUserByUsername = async (username) => {
@@ -68,8 +76,8 @@ export const getUserByUsername = async (username) => {
   return account;
 };
 
-export const checkCookie = (cookie, username) => {
-  const user = getLoggedInUser(cookie);
+export const checkCookie = async (cookie, username) => {
+  const user = await getLoggedInUser(cookie);
   return user?.account.username === username;
 };
 
