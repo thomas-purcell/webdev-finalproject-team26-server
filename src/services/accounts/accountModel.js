@@ -1,11 +1,17 @@
 /* eslint-disable no-underscore-dangle */
-import { randomUUID } from 'crypto';
+import { randomUUID, randomBytes, pbkdf2Sync } from 'crypto';
 import logger from '../../logger.js';
 import * as accountDao from './accountDao.js';
 
 // Store logged in users on the server only, not in the database
 // This means if server restarts then all users will need to log in again
 const loggedInUsers = [];
+
+const hashPassword = (password, salt) => {
+  const hashed = pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+  // logger.info(hashed);
+  return hashed;
+};
 
 export const logUserIn = async ({ email, username, password }) => {
   let account;
@@ -20,20 +26,24 @@ export const logUserIn = async ({ email, username, password }) => {
   // if we didn't find an account then we can't compare passwords
   // if we did get an account, see if they have the right password
   // TODO: passwords are stored as plaintext right now
-  if (!account || account.password !== password) {
+  if (!account || account.password !== hashPassword(password, account.salt)) {
+    logger.info('Failed login attempt for:', username);
     return undefined;
   }
   // if all checks were successful, then give the user a cookie and log them in
   // this is kinda insecure but works for now
   const cookie = randomUUID();
   loggedInUsers.push({ cookie, account });
-  logger.info('Logging in:', account.email);
+  logger.info('Logging in:', account.username);
   return cookie;
 };
 
 export const registerNewUser = async (newAccountInfo) => {
+  const salt = randomBytes(16).toString('hex');
   const newAccount = {
     ...newAccountInfo,
+    password: hashPassword(newAccountInfo.password, salt),
+    salt,
     watchAnime: false,
     watchMovies: false,
     watchTv: false,
@@ -44,9 +54,10 @@ export const registerNewUser = async (newAccountInfo) => {
   await accountDao.registerUser(newAccount);
   logger.info('Registering:', newAccount.email);
   // log the user in after creating their account
+  // use the supplied username and password because the db object will be hashed already
   const cookie = await logUserIn({
-    email: newAccount.email,
-    password: newAccount.password,
+    username: newAccountInfo.username,
+    password: newAccountInfo.password,
   });
   return cookie;
 };
@@ -72,6 +83,11 @@ export const getLoggedInUser = async (cookie) => {
 
 export const getUserByUsername = async (username) => {
   const account = await accountDao.getAccountByUsername(username, false);
+  return account;
+};
+
+export const getUserByEmail = async (email) => {
+  const account = await accountDao.getAccountByEmail(email, false);
   return account;
 };
 
