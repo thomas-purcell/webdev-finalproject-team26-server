@@ -147,14 +147,17 @@ export const getClubAnnouncementsForUser = async (username) => {
       ...announcement,
     }));
   }));
-  return announcements.flat();
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+  const filtered = announcements.flat().filter((a) => Number(a.timestamp) >= oneWeekAgo.getTime());
+  return filtered;
 };
 
 const getReplies = async (parent, comments) => {
   const replies = comments.filter((child) => parent._id.toString() === child.replyToId);
   if (replies) {
     const result = await Promise.all(replies.map(async (c) => {
-      const { username } = await accountModel.getAccountById(parent.memberId);
+      const { username } = await accountModel.getAccountById(c.memberId);
       return {
         ...c,
         username,

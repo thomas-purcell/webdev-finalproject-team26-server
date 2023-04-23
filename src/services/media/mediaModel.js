@@ -20,8 +20,8 @@ export const getReviewsByUser = async (userId) => {
 
 export const getDiscussingByUser = async (userId) => {
   const dicussing = await clubDao.getClubDiscussions(userId);
-  return dicussing.map((w) => ({ ... w, discussing: true}));
-}
+  return dicussing.map((w) => ({ ...w, discussing: true }));
+};
 
 export const getMediaByMediaId = async (mediaType, mediaId) => {
   const media = await mediaDao.getMediaByMediaId(mediaType, mediaId);
@@ -88,8 +88,8 @@ export const getReviewsByMediaId = async (mediaType, mediaId) => {
 
 export const getRecentReviews = async () => {
   const result = await mediaDao.getReviews();
-  const sortedReviews = result.sort(
-    (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+  const sortedReviews = result.filter((a) => a.comment).sort(
+    (a, b) => Number(b.timestamp) - Number(a.timestamp),
   ).splice(0, 4);
 
   const enrichedResults = await Promise.all(sortedReviews.map(async (media) => {

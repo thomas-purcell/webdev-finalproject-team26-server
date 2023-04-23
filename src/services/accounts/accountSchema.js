@@ -4,6 +4,7 @@ const schema = mongoose.Schema({
   email: String,
   username: String,
   password: String,
+  salt: String,
   isMemberAccount: Boolean,
   firstName: String,
   lastName: String,

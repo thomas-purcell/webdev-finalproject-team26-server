@@ -26,6 +26,12 @@ accountController(server);
 mediaController(server);
 clubController(server);
 
+// eslint-disable-next-line no-unused-vars
+server.use((err, req, res, next) => {
+  logger.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
 server.listen(config.port, () => {
   logger.info(`Server is listening on port ${config.port}`);
 });
