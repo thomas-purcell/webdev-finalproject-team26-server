@@ -1,6 +1,7 @@
 import * as mediaDao from './mediaDao.js';
 import * as accountModel from '../accounts/accountModel.js';
 import * as clubDao from '../clubs/clubDao.js';
+// eslint-disable-next-line no-unused-vars
 import logger from '../../logger.js';
 
 export const getLikesByUser = async (userId) => {
@@ -64,7 +65,6 @@ export const addReviewByUserIdMediaId = async (mediaType, mediaId, userId, revie
     ...review,
     timestamp: (new Date()).getTime().toString(),
   };
-  logger.info(newReview);
   const result = await mediaDao.addReviewByUserIdMediaId(mediaType, mediaId, userId, newReview);
   return result;
 };
