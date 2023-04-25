@@ -116,27 +116,7 @@ const mediaByUsernameMediaIdHandler = async (req, res, next) => {
       res.sendStatus(404);
       return;
     }
-    const [media, likes, watches, reviews, discussing] = await Promise.all([
-      mediaModel.getMediaByMediaId(mediaType, mediaId),
-      mediaModel.getLikesByUser(user._id),
-      mediaModel.getWatchesByUser(user._id),
-      mediaModel.getReviewsByUser(user._id),
-      mediaModel.getDiscussingByUser(user._id),
-    ]);
-    if (!media) {
-      res.sendStatus(404);
-      return;
-    }
-    const review = reviews.find((l) => l.mediaId === mediaId);
-    const result = {
-      ...media,
-      liked: !!likes.find((l) => l.mediaId === mediaId),
-      watched: !!watches.find((l) => l.mediaId === mediaId),
-      discussing: !!discussing.find((l) => l.mediaId === mediaId),
-      reviewed: !!review,
-      rating: review?.rating,
-      comment: review?.comment,
-    };
+    const result = await mediaModel.getMediaByUsernameMediaId(mediaType, mediaId, user._id);
     res.send(result);
   } catch (e) {
     next(e);
@@ -156,7 +136,8 @@ const addWatchByUsernameMediaIdHandler = async (req, res, next) => {
       return;
     }
     await mediaModel.addWatchByUserIdMediaId(mediaType, mediaId, user._id);
-    res.sendStatus(200);
+    const result = await mediaModel.getMediaByUsernameMediaId(mediaType, mediaId, user._id);
+    res.send(result);
   } catch (e) {
     next(e);
   }
@@ -175,7 +156,8 @@ const deleteWatchByUsernameMediaIdHandler = async (req, res, next) => {
       return;
     }
     await mediaModel.deleteWatchByUserIdMediaId(mediaType, mediaId, user._id);
-    res.sendStatus(200);
+    const result = await mediaModel.getMediaByUsernameMediaId(mediaType, mediaId, user._id);
+    res.send(result);
   } catch (e) {
     next(e);
   }
@@ -194,7 +176,8 @@ const addLikeByUsernameMediaIdHandler = async (req, res, next) => {
       return;
     }
     await mediaModel.addLikeByUserIdMediaId(mediaType, mediaId, user._id);
-    res.sendStatus(200);
+    const result = await mediaModel.getMediaByUsernameMediaId(mediaType, mediaId, user._id);
+    res.send(result);
   } catch (e) {
     next(e);
   }
@@ -213,7 +196,8 @@ const deleteLikeByUsernameMediaIdHandler = async (req, res, next) => {
       return;
     }
     await mediaModel.deleteLikeByUserIdMediaId(mediaType, mediaId, user._id);
-    res.sendStatus(200);
+    const result = await mediaModel.getMediaByUsernameMediaId(mediaType, mediaId, user._id);
+    res.send(result);
   } catch (e) {
     next(e);
   }
@@ -247,7 +231,8 @@ const addReviewByUsernameMediaIdHandler = async (req, res, next) => {
       return;
     }
     await mediaModel.addReviewByUserIdMediaId(mediaType, mediaId, user._id, req.body);
-    res.sendStatus(200);
+    const result = await mediaModel.getMediaByUsernameMediaId(mediaType, mediaId, user._id);
+    res.send(result);
   } catch (e) {
     next(e);
   }

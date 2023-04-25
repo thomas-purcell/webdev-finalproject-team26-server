@@ -113,7 +113,9 @@ export const getClubsByMemberUsername = async (memberUsername) => {
 export const getNewMembersByClub = async (clubUsername) => {
   const club = await accountModel.getUserByUsername(clubUsername);
   const members = await clubDao.getClubMembers(club._id);
-  const sortedMembers = members.sort((a, b) => new Date(b) - new Date(a)).splice(0, 3);
+  const sortedMembers = members.sort(
+    (a, b) => Number(b.joinedDate) - Number(a.joinedDate),
+  ).splice(0, 3);
   const enrichedMembers = await Promise.all(sortedMembers.map(async (member) => {
     const profile = await accountModel.getAccountById(member.memberId);
     return {
@@ -202,7 +204,7 @@ export const createDiscussionCommentForMedia = async (clubUsername, mediaType, m
 export const getRecentComments = async (clubUsername) => {
   const club = await accountModel.getUserByUsername(clubUsername);
   const comments = await clubDao.getCommentsForClub(club._id);
-  const sorted = comments.sort((a, b) => new Date(b) - new Date(a)).splice(0, 4);
+  const sorted = comments.sort((a, b) => Number(b.timestamp) - Number(a.timestamp)).splice(0, 4);
   const enrichedComments = await Promise.all(sorted.map(async (c) => {
     const discussion = await clubDao.getDiscussionByDiscussionId(c.discussionId);
     const media = await mediaModel.getMediaByMediaId(discussion.mediaType, discussion.mediaId);

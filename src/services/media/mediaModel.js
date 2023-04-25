@@ -1,6 +1,7 @@
 import * as mediaDao from './mediaDao.js';
 import * as accountModel from '../accounts/accountModel.js';
 import * as clubDao from '../clubs/clubDao.js';
+// eslint-disable-next-line no-unused-vars
 import logger from '../../logger.js';
 
 export const getLikesByUser = async (userId) => {
@@ -64,7 +65,6 @@ export const addReviewByUserIdMediaId = async (mediaType, mediaId, userId, revie
     ...review,
     timestamp: (new Date()).getTime().toString(),
   };
-  logger.info(newReview);
   const result = await mediaDao.addReviewByUserIdMediaId(mediaType, mediaId, userId, newReview);
   return result;
 };
@@ -114,7 +114,8 @@ export const getRecentlyReviewedByLiked = async (username) => {
       return reviews;
     }),
   );
-  const enriched = await Promise.all(reviewedMedia.flat().map(async (media) => {
+  const filtered = reviewedMedia.flat().filter((a) => a.comment.length > 0);
+  const enriched = await Promise.all(filtered.map(async (media) => {
     const enrichedMedia = await mediaDao.getMediaByMediaId(media.mediaType, media.mediaId);
     return {
       ...media,
@@ -122,6 +123,28 @@ export const getRecentlyReviewedByLiked = async (username) => {
       title: enrichedMedia.title,
     };
   }));
-  const sorted = enriched.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const sorted = enriched.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
   return sorted.splice(0, 4);
+};
+
+export const getMediaByUsernameMediaId = async (mediaType, mediaId, userId) => {
+  const [media, likes, watches, reviews, discussing] = await Promise.all([
+    getMediaByMediaId(mediaType, mediaId),
+    getLikesByUser(userId),
+    getWatchesByUser(userId),
+    getReviewsByUser(userId),
+    getDiscussingByUser(userId),
+  ]);
+  const review = reviews.find((l) => l.mediaId === mediaId);
+  const result = {
+    ...media,
+    liked: !!likes.find((l) => l.mediaId === mediaId),
+    watched: !!watches.find((l) => l.mediaId === mediaId),
+    discussing: !!discussing.find((l) => l.mediaId === mediaId),
+    reviewed: !!review,
+    rating: review?.rating,
+    comment: review?.comment,
+    avgRating: (await getAverageRatingByMediaId(mediaType, mediaId)),
+  };
+  return result;
 };
