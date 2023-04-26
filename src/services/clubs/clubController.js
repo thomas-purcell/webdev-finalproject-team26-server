@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import * as clubModel from './clubModel.js';
 import * as accountModel from '../accounts/accountModel.js';
+import * as mediaModel from '../media/mediaModel.js';
 import logger from '../../logger.js';
 
 const getClubsHandler = async (req, res, next) => {
@@ -121,7 +122,9 @@ const createCommentForClubDiscussionHandler = async (req, res, next) => {
 const addClubDiscussionByClubHandler = async (req, res, next) => {
   try {
     const { username, mediaType, mediaId } = req.params;
-    const result = await clubModel.createClubDiscussion(username, mediaType, mediaId);
+    const club = await accountModel.getUserByUsername(username);
+    await clubModel.createClubDiscussion(club._id, mediaType, mediaId);
+    const result = await mediaModel.getMediaByUsernameMediaId(mediaType, mediaId, club._id);
     res.send(result);
   } catch (e) {
     next(e);
@@ -131,7 +134,9 @@ const addClubDiscussionByClubHandler = async (req, res, next) => {
 const deleteClubDiscussionByClubHandler = async (req, res, next) => {
   try {
     const { username, mediaType, mediaId } = req.params;
-    const result = await clubModel.deleteClubDiscussion(username, mediaType, mediaId);
+    const club = await accountModel.getUserByUsername(username);
+    await clubModel.deleteClubDiscussion(club._id, mediaType, mediaId);
+    const result = await mediaModel.getMediaByUsernameMediaId(mediaType, mediaId, club._id);
     res.send(result);
   } catch (e) {
     next(e);
